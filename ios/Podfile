@@ -30,10 +30,13 @@ flutter_ios_podfile_setup
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
-
+  
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  pod 'TensorFlowLiteSwift', :git => 'https://github.com/tensorflow/tensorflow.git', :branch => 'master', :shallow => true
-
+  
+  # Utiliser la version officielle CocoaPods au lieu de Git
+  pod 'TensorFlowLiteC', '~> 2.12.0'
+  pod 'TensorFlowLiteSwift', '~> 2.12.0'
+  
   target 'RunnerTests' do
     inherit! :search_paths
   end
@@ -44,6 +47,13 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      
+      # Ajout des chemins d'en-têtes pour TensorFlow Lite
+      config.build_settings['HEADER_SEARCH_PATHS'] = [
+        '$(inherited)',
+        '$(PODS_ROOT)/TensorFlowLiteC',
+        '$(PODS_ROOT)/TensorFlowLiteC/include'
+      ]
     end
   end
 end
